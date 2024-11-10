@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: petclinic
+    app.kubernetes.io/component: database
+    app.kuberentes.io/part-of: petclinic
+    app: postgres
+  name: postgres
+  namespace: petclinic
+spec:
+  ports:
+  - name: db
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: postgres
+  type: ClusterIP

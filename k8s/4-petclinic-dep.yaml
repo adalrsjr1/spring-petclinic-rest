@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: petclinic
+    app.kubernetes.io/component: backend
+    app.kuberentes.io/part-of: petclinic
+    app: petclinic
+  name: petclinic
+  namespace: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: petclinic
+    spec:
+      containers:
+      - image: spring-petclinic-rest:3.2.1
+        imagePullPolicy: IfNotPresent
+        name: spring-petclinic-rest
+        ports:
+          - name: http
+            containerPort: 9966
+        env:
+          # one - for select database
+          # ------------------------------------------------
+          # When using HSQL, use: hsqldb
+          # When using MySQL, use: mysql
+          # When using PostgeSQL, use: postgres
+          # ------------------------------------------------
+          #
+          # one for select repository layer
+          # ------------------------------------------------
+          # When using Spring jpa, use: jpa
+          # When using Spring JDBC, use: jdbc
+          # When using Spring Data JPA, use: spring-data-jpa
+          # ------------------------------------------------
+          #
+          # spring.profiles.active=hsqldb,spring-data-jpa
+          #
+          - name: SPRING_PROFILES_ACTIVE
+            value: postgres,jdbc
+          - name: POSTGRES_URL
+            value: "jdbc:postgresql://postgres/petclinic"
+          - name: SPRING_SQL_INIT_CONTINUE-ON-ERROR
+            value: "true"
+          - name: JAVA_TOOL_OPTIONS
+            # https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#determine-which-gc-to-use
+            # https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html
+            # https://docs.oracle.com/en/java/javase/11/gctuning/available-collectors.html
+            #
+            # ProcessorCount twice the limits
+            value: "-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -XX:ActiveProcessorCount=2"
+        resources:
+          requests:
+            cpu: 1
+            memory: 1024Mi
+          limits:
+            cpu: 1
+            memory: 1024Mi
+        livenessProbe:
+          httpGet:
+            path: /petclinic/actuator/health/liveness
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /petclinic/actuator/health/readiness
+            port: http
+        startupProbe:
+          httpGet:
+            path: /petclinic/actuator/health
+            port: http
+          failureThreshold: 6
+          periodSeconds: 10

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: petclinic
+    app.kubernetes.io/component: database
+    app.kuberentes.io/part-of: petclinic
+    app: postgres
+  name: postgres
+  namespace: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - image: postgres:16.3
+        imagePullPolicy: IfNotPresent
+        name: postgres
+        env:
+          - name: POSTGRES_USER
+            value: petclinic
+          - name: POSTGRES_PASSWORD
+            value: petclinic
+          - name: POSTGRES_DB
+            value: petclinic
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+          limits:
+            cpu: 1
+            memory: 128Mi

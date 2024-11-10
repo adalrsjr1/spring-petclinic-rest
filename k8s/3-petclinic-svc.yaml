@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: petclinic
+    app.kubernetes.io/component: backend
+    app.kuberentes.io/part-of: petclinic
+    app: petclinic
+  name: petclinic
+  namespace: petclinic
+spec:
+  ports:
+  - name: http
+    port: 9966
+    protocol: TCP
+    targetPort: 9966
+  selector:
+    app: petclinic
+  type: ClusterIP
